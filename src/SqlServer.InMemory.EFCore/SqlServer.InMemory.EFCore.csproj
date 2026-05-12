@@ -1,12 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <ProjectReference Include="..\SqlServer.InMemory\SqlServer.InMemory.csproj" />
-    <ProjectReference Include="..\SqlServer.InMemory.Sqlite\SqlServer.InMemory.Sqlite.csproj" />
-    <ProjectReference Include="..\SqlServer.InMemory.TSql\SqlServer.InMemory.TSql.csproj" />
+    <ProjectReference Include="..\SqlServer.InMemory\SqlServer.InMemory.csproj" PrivateAssets="all" />
+    <ProjectReference Include="..\SqlServer.InMemory.Sqlite\SqlServer.InMemory.Sqlite.csproj" PrivateAssets="all" />
+    <ProjectReference Include="..\SqlServer.InMemory.TSql\SqlServer.InMemory.TSql.csproj" PrivateAssets="all" />
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="10.0.7" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.7" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.7" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.7" />
@@ -14,8 +15,16 @@
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
+    <PackageId>SqlServer.InMemory</PackageId>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <TargetsForTfmSpecificBuildOutput>$(TargetsForTfmSpecificBuildOutput);IncludeProjectReferencesInPackage</TargetsForTfmSpecificBuildOutput>
   </PropertyGroup>
+
+  <Target Name="IncludeProjectReferencesInPackage" DependsOnTargets="ResolveReferences">
+    <ItemGroup>
+      <BuildOutputInPackage Include="@(ReferenceCopyLocalPaths->WithMetadataValue('ReferenceSourceTarget', 'ProjectReference'))" />
+    </ItemGroup>
+  </Target>
 
 </Project>

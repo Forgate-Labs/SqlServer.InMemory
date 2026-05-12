@@ -18,6 +18,11 @@ internal sealed class SqlServerInMemoryModelCustomizer : ModelCustomizer
     {
         base.Customize(modelBuilder, context);
 
+        foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+        {
+            SqlServerInMemoryColumnTypeNormalizer.Normalize(entityType);
+        }
+
         if (!_options.NormalizeSchemas)
         {
             return;

@@ -16,26 +16,32 @@ internal sealed class SqlServerInMemoryModelFinalizingConvention : IModelFinaliz
 
     public void ProcessModelFinalizing(IConventionModelBuilder modelBuilder, IConventionContext<IConventionModelBuilder> context)
     {
+        foreach (var entityType in modelBuilder.Metadata.GetEntityTypes())
+        {
+            SqlServerInMemoryColumnTypeNormalizer.Normalize(entityType);
+            NormalizeSchema(entityType);
+        }
+    }
+
+    private void NormalizeSchema(IConventionEntityType entityType)
+    {
         if (!_options.NormalizeSchemas)
         {
             return;
         }
 
-        foreach (var entityType in modelBuilder.Metadata.GetEntityTypes())
+        var tableName = entityType.GetTableName() ?? entityType.ShortName();
+        var schema = entityType.GetSchema();
+        if (string.IsNullOrWhiteSpace(tableName) || string.IsNullOrWhiteSpace(schema))
         {
-            var tableName = entityType.GetTableName() ?? entityType.ShortName();
-            var schema = entityType.GetSchema();
-            if (string.IsNullOrWhiteSpace(tableName) || string.IsNullOrWhiteSpace(schema))
-            {
-                continue;
-            }
-
-            var normalizedName = _options.SchemaMode == SqlServerInMemorySchemaMode.PrefixSchemaName
-                ? $"{schema}_{tableName}"
-                : tableName;
-
-            entityType.Builder.HasAnnotation(RelationalAnnotationNames.TableName, normalizedName);
-            entityType.Builder.HasAnnotation(RelationalAnnotationNames.Schema, null);
+            return;
         }
+
+        var normalizedName = _options.SchemaMode == SqlServerInMemorySchemaMode.PrefixSchemaName
+            ? $"{schema}_{tableName}"
+            : tableName;
+
+        entityType.Builder.HasAnnotation(RelationalAnnotationNames.TableName, normalizedName);
+        entityType.Builder.HasAnnotation(RelationalAnnotationNames.Schema, null);
     }
 }

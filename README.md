@@ -1,5 +1,7 @@
 # SqlServer.InMemory
 
+[![NuGet](https://img.shields.io/nuget/v/SqlServer.InMemory.svg?label=NuGet)](https://www.nuget.org/packages/SqlServer.InMemory/0.1.1)
+
 SqlServer.InMemory is not a full SQL Server emulator. It is a testing-oriented EF Core provider/adapter that uses SQLite in-memory as the execution engine and adds SQL Server-inspired compatibility behavior.
 
 The project is a proof of concept for automated tests that want a relational in-memory database with an API close to SQL Server-oriented EF Core setup:

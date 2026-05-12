@@ -1,0 +1,21 @@
+<Project>
+  <PropertyGroup>
+    <Version>0.1.1</Version>
+    <PackageVersion>0.1.1</PackageVersion>
+    <Authors>Forgate Labs</Authors>
+    <Company>Forgate Labs</Company>
+    <Product>SqlServer.InMemory</Product>
+    <Description>Testing-oriented EF Core adapter that uses SQLite in-memory with SQL Server-inspired compatibility behavior.</Description>
+    <PackageProjectUrl>https://github.com/Forgate-Labs/SqlServer.InMemory</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/Forgate-Labs/SqlServer.InMemory</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageTags>sqlserver;inmemory;efcore;sqlite;testing</PackageTags>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(IsPackable)' != 'false'">
+    <None Include="$(MSBuildThisFileDirectory)README.md" Pack="true" PackagePath="\" Visible="false" />
+  </ItemGroup>
+</Project>
