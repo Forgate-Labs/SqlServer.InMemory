@@ -1,6 +1,7 @@
 using System.Data.Common;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore.Diagnostics;
+using SqlServer.InMemory;
 using SqlServer.InMemory.Exceptions;
 using SqlServer.InMemory.TSql;
 
@@ -9,10 +10,12 @@ namespace SqlServer.InMemory.EFCore.Interceptors;
 internal sealed class SqlServerInMemoryCommandInterceptor : DbCommandInterceptor
 {
     private readonly ITSqlTranslator _translator;
+    private readonly SqlServerInMemoryOptions _options;
 
-    public SqlServerInMemoryCommandInterceptor(ITSqlTranslator translator)
+    public SqlServerInMemoryCommandInterceptor(ITSqlTranslator translator, SqlServerInMemoryOptions options)
     {
         _translator = translator;
+        _options = options;
     }
 
     public override InterceptionResult<DbDataReader> ReaderExecuting(
@@ -84,6 +87,8 @@ internal sealed class SqlServerInMemoryCommandInterceptor : DbCommandInterceptor
 
     private void TranslateCommand(DbCommand command)
     {
+        command.CommandText = SqlServerConditionalBlockEvaluator.Evaluate(command.Connection, _options, command.CommandText);
+        command.CommandText = SqlServerSchemaQualifierNormalizer.Normalize(command.Connection, _options, command.CommandText);
         command.CommandText = _translator.TranslateToSqlite(command.CommandText);
         NormalizeSqliteParameters(command);
     }

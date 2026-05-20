@@ -1,6 +1,6 @@
 # SqlServer.InMemory
 
-[![NuGet](https://img.shields.io/nuget/v/SqlServer.InMemory.svg?label=NuGet)](https://www.nuget.org/packages/SqlServer.InMemory/0.1.1)
+[![NuGet](https://img.shields.io/nuget/v/SqlServer.InMemory.svg?label=NuGet)](https://www.nuget.org/packages/SqlServer.InMemory/0.1.3)
 
 SqlServer.InMemory is not a full SQL Server emulator. It is a testing-oriented EF Core provider/adapter that uses SQLite in-memory as the execution engine and adds SQL Server-inspired compatibility behavior.
 
@@ -12,7 +12,10 @@ var options = new DbContextOptionsBuilder<AppDbContext>()
     .Options;
 
 await using var context = new AppDbContext(options);
-await context.Database.EnsureCreatedAsync();
+await context.Database.EnsureCreatedAsync(); // fast model-based setup
+
+// Schema-oriented alternative; do not use both on the same database:
+// await context.Database.MigrateAsync();
 ```
 
 ## What it is
@@ -54,7 +57,10 @@ var options = new DbContextOptionsBuilder<AppDbContext>()
     .Options;
 
 await using var context = new AppDbContext(options);
-await context.Database.EnsureCreatedAsync();
+await context.Database.EnsureCreatedAsync(); // fast model-based setup
+
+// Schema-oriented alternative; do not use both on the same database:
+// await context.Database.MigrateAsync();
 ```
 
 ## Implemented in this POC
@@ -68,6 +74,8 @@ await context.Database.EnsureCreatedAsync();
   - `IgnoreSchema`: `auth.Users` becomes `Users`.
 - Basic exception translation for SQLite foreign key and unique constraint errors.
 - Automatic raw SQL translation through an EF Core command interceptor.
+- `MigrateAsync` support through a custom migrations assembly and SQL generator that run migrations as SQL Server-oriented migrations and normalize operations for the SQLite in-memory backend.
+- SQLite table rebuild support for migration operations that SQLite cannot alter in place, such as dropping foreign keys, changing columns, and changing table constraints.
 - Compatibility wrapper that accepts SQL Server `DbParameter` instances, including `Microsoft.Data.SqlClient.SqlParameter`, when the SQLite command is created.
 - Translation for common test-oriented T-SQL constructs: `dbo.`, `N'...'`, `GETDATE()`, `DATEADD`, `ISNULL`, `COUNT_BIG`, `TOP`, `OFFSET/FETCH`, `SET IDENTITY_INSERT`, guarded seed inserts, `IF OBJECT_ID` guards, and `OUTPUT INSERTED` for simple inserts.
 - Core custom exception types.
@@ -80,6 +88,7 @@ await context.Database.EnsureCreatedAsync();
 - Case-insensitive collation is registered, but columns are not automatically rewritten to use it in every model scenario.
 - Exception translation is intentionally narrow and based on SQLite error codes.
 - Raw SQL translation is automatic, but it uses a regex-based translator intended for tests and known patterns.
+- Migrations are executed by translating SQL Server-like migration operations to SQLite-compatible operations; unsupported SQL Server-only operations fail explicitly instead of silently passing.
 - The basic translator is not a full T-SQL parser.
 - Complex T-SQL such as `MERGE`, `OUTER APPLY`, stored procedures, temporary tables, table variables, dynamic SQL, and arbitrary procedural `IF/ELSE` blocks are still unsupported unless rewritten into supported patterns.
 

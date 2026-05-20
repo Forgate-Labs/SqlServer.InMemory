@@ -1,7 +1,7 @@
 <Project>
   <PropertyGroup>
-    <Version>0.1.1</Version>
-    <PackageVersion>0.1.1</PackageVersion>
+    <Version>0.1.7</Version>
+    <PackageVersion>0.1.7</PackageVersion>
     <Authors>Forgate Labs</Authors>
     <Company>Forgate Labs</Company>
     <Product>SqlServer.InMemory</Product>

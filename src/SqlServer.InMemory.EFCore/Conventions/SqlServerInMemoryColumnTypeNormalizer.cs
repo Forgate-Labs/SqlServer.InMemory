@@ -41,19 +41,15 @@ internal static class SqlServerInMemoryColumnTypeNormalizer
             return null;
         }
 
-        var canonicalType = GetCanonicalColumnType(columnType);
+        var canonicalType = SqlServerInMemoryTypeMapper.NormalizeSqlServerTypeName(columnType);
 
         if (IsSqlServerBigIntIdentityPrimaryKey(entityType, property, canonicalType))
         {
             return "INTEGER";
         }
 
-        return canonicalType switch
-        {
-            "nvarchar(max)" or "varchar(max)" or "ntext" or "text" => "TEXT",
-            "varbinary(max)" or "image" => "BLOB",
-            _ => null
-        };
+        var sqliteType = SqlServerInMemoryTypeMapper.ToSqliteType(columnType);
+        return sqliteType.Equals(columnType, StringComparison.Ordinal) ? null : sqliteType;
     }
 
     private static bool IsSqlServerBigIntIdentityPrimaryKey(IReadOnlyEntityType entityType, IReadOnlyProperty property, string canonicalType)
@@ -62,23 +58,5 @@ internal static class SqlServerInMemoryColumnTypeNormalizer
             && property.ClrType == typeof(long)
             && property.ValueGenerated == ValueGenerated.OnAdd
             && entityType.FindPrimaryKey()?.Properties.Contains(property) == true;
-    }
-
-    private static string GetCanonicalColumnType(string columnType)
-    {
-        var buffer = new char[columnType.Length];
-        var length = 0;
-
-        foreach (var character in columnType)
-        {
-            if (char.IsWhiteSpace(character) || character is '[' or ']')
-            {
-                continue;
-            }
-
-            buffer[length++] = char.ToLowerInvariant(character);
-        }
-
-        return new string(buffer, 0, length);
     }
 }

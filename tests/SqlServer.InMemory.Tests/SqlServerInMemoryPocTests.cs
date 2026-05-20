@@ -171,7 +171,7 @@ public sealed class SqlServerInMemoryPocTests
         var translated = translator.TranslateToSqlite("SELECT TOP(10) * FROM [dbo].[Users]");
 
         // Assert
-        translated.Should().Be("SELECT * FROM \"dbo_Users\" LIMIT 10");
+        translated.Should().Be("SELECT * FROM \"Users\" LIMIT 10");
     }
 
     private static TestDbContext CreateContext(Action<SqlServerInMemoryOptions>? configure = null)

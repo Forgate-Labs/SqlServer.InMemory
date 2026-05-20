@@ -17,6 +17,19 @@ public class SqlServerInMemoryException : Exception
     }
 }
 
+public class SqlServerInMemoryMigrationException : SqlServerInMemoryException
+{
+    public SqlServerInMemoryMigrationException(string message)
+        : base(message)
+    {
+    }
+
+    public SqlServerInMemoryMigrationException(string message, Exception innerException)
+        : base(message, innerException)
+    {
+    }
+}
+
 public class SqlServerInMemoryConstraintException : SqlServerInMemoryException
 {
     public SqlServerInMemoryConstraintException(string message, Exception innerException)

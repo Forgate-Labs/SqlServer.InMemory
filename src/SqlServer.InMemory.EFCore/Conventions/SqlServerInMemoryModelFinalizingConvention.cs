@@ -37,9 +37,11 @@ internal sealed class SqlServerInMemoryModelFinalizingConvention : IModelFinaliz
             return;
         }
 
-        var normalizedName = _options.SchemaMode == SqlServerInMemorySchemaMode.PrefixSchemaName
-            ? $"{schema}_{tableName}"
-            : tableName;
+        var normalizedName = schema.Equals("dbo", StringComparison.OrdinalIgnoreCase)
+            ? tableName
+            : _options.SchemaMode == SqlServerInMemorySchemaMode.PrefixSchemaName
+                ? $"{schema}_{tableName}"
+                : tableName;
 
         entityType.Builder.HasAnnotation(RelationalAnnotationNames.TableName, normalizedName);
         entityType.Builder.HasAnnotation(RelationalAnnotationNames.Schema, null);

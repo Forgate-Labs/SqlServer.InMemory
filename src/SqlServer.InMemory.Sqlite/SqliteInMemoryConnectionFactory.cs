@@ -85,6 +85,8 @@ public sealed class SqliteInMemoryConnectionFactory : ISqliteInMemoryConnectionF
 
     private static void ConfigureConnection(SqliteConnection connection, SqlServerInMemoryOptions options)
     {
+        SqlServerCatalogFunctions.Register(connection, options);
+
         if (options.UseCaseInsensitiveCollation)
         {
             connection.CreateCollation(

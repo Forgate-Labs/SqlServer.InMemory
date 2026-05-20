@@ -37,9 +37,11 @@ internal sealed class SqlServerInMemoryModelCustomizer : ModelCustomizer
                 continue;
             }
 
-            var normalizedName = _options.SchemaMode == SqlServerInMemorySchemaMode.PrefixSchemaName
-                ? $"{schema}_{tableName}"
-                : tableName;
+            var normalizedName = schema.Equals("dbo", StringComparison.OrdinalIgnoreCase)
+                ? tableName
+                : _options.SchemaMode == SqlServerInMemorySchemaMode.PrefixSchemaName
+                    ? $"{schema}_{tableName}"
+                    : tableName;
 
             entityType.SetTableName(normalizedName);
             entityType.SetSchema(null);
